@@ -14,6 +14,8 @@ import { doc, setDoc } from 'firebase/firestore'
 
 import { profileColors } from '@/utils/constants'
 
+import Loader from '@/components/Loader'
+
 
 const Register = () => {
 
@@ -97,7 +99,7 @@ const Register = () => {
 
 
 
-    return isLoading || (!isLoading && currentUser) ? 'Loader...' : (
+    return isLoading || (!isLoading && currentUser) ? <Loader /> : (
         <div className='h-[100vh] flex justify-center items-center bg-c1'>
             <div className='flex items-center flex-col'>
 

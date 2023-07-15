@@ -14,6 +14,9 @@ import { useRouter } from "next/router"
 import ToastMessage from '@/components/ToastMessage'
 import { toast } from 'react-toastify';
 
+import Loader from '@/components/Loader'
+
+
 const Login = () => {
 
     const router = useRouter()
@@ -92,7 +95,7 @@ const Login = () => {
 
 
 
-    return isLoading || (!isLoading && currentUser) ? 'Loader...' : (
+    return isLoading || (!isLoading && currentUser) ? <Loader /> : (
 
         <div className='h-[100vh] flex justify-center items-center bg-c1'>
 
