@@ -11,13 +11,16 @@ import { profileColors } from '@/utils/constants'
 import ToastMessage from '@/components/ToastMessage'
 import { toast } from 'react-toastify';
 import { doc, updateDoc } from 'firebase/firestore'
-import { db, auth } from '@/firebase/firebase'
+import { db, auth, storage } from '@/firebase/firebase'
 import { updateProfile } from 'firebase/auth'
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage'
+import UsersPopup from './popup/UsersPopup'
 
 
 const LeftNav = () => {
 
-    const [editProfile, setEditProfile] = useState(true)
+    const [usersPopup, setUsersPopup] = useState(false)
+    const [editProfile, setEditProfile] = useState(false)
     const [nameEdited, setnameEdited] = useState(false)
 
     const { currentUser, signOut, setCurrentUser } = useAuth()
@@ -29,6 +32,37 @@ const LeftNav = () => {
         try {
 
             if (file) {
+                const storageRef = ref(storage, currentUser.displayName);
+                const uploadTask = uploadBytesResumable(storageRef, file);
+
+                uploadTask.on('state_changed',
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        console.log('Upload is ' + progress + '% done');
+                        switch (snapshot.state) {
+                            case 'paused':
+                                console.log('Upload is paused');
+                                break;
+                            case 'running':
+                                console.log('Upload is running');
+                                break;
+                        }
+                    },
+                    (error) => {
+                        console.error(error)
+                    },
+                    () => {
+                        getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+                            console.log('File available at', downloadURL);
+
+                            handleUpdateProfile('photo', downloadURL)
+
+                            await updateProfile(authUser, {
+                                photoURL: downloadURL
+                            })
+                        });
+                    }
+                );
 
             }
 
@@ -163,7 +197,7 @@ const LeftNav = () => {
                     {currentUser.photoURL &&
                         (
                             <div className='w-6 h-6 rounded-full bg-red-500 flex justify-center items-center absolute right-0 bottom-0'>
-                                <MdDeleteForever size={14} />
+                                <MdDeleteForever size={14} onClick={() => handleUpdateProfile('photo-remove')} />
                             </div>
                         )
                     }
@@ -251,7 +285,7 @@ const LeftNav = () => {
                     size='x-large'
                     className='bg-green-500 hover:bg-gray-600'
                     icon={<FiPlus size={24} />}
-                    onClick={() => { }}
+                    onClick={() => setUsersPopup(!usersPopup)}
                 />
 
                 <Icon
@@ -261,6 +295,9 @@ const LeftNav = () => {
                     onClick={signOut}
                 />
             </div>
+
+
+            {usersPopup && <UsersPopup onHide={() => setUsersPopup(false)} title='Find Users' />}
 
         </div>
     )
