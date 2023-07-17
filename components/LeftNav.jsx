@@ -74,7 +74,7 @@ const LeftNav = () => {
 
 
 
-    const handleUpdateProfile = (type, value) => {
+    const handleUpdateProfile = async (type, value) => {
 
         let obj = { ...currentUser }
 
@@ -126,7 +126,7 @@ const LeftNav = () => {
                 success: 'Profile updated successfully',
                 error: 'Profile update failed'
             }, {
-                autoClose: 5000
+                autoClose: 3000
             })
         }
         catch (error) {

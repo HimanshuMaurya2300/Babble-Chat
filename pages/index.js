@@ -1,17 +1,20 @@
 import React, { useEffect } from 'react'
 
 import { useAuth } from '@/context/authContext'
+import { userChatContext } from '@/context/chatContext'
 import { useRouter } from 'next/router'
 
 import Loader from '@/components/Loader'
 import LeftNav from '@/components/LeftNav'
 import Chats from '@/components/Chats'
+import Chat from '@/components/Chat'
 
 
 const Home = () => {
 
   const { signOut, currentUser, isLoading } = useAuth()
   const router = useRouter()
+  const { data } = userChatContext()
 
   useEffect(() => {
 
@@ -38,7 +41,7 @@ const Home = () => {
             </div>
           </div>
 
-          <div>chat</div>
+          {data.user && <Chat />}
         </div>
       </div>
     </div>
