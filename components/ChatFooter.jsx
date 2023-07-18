@@ -13,7 +13,7 @@ import { MdDeleteForever } from 'react-icons/md'
 const ChatFooter = () => {
 
     const [showEmojiPicker, setShowEmojiPicker] = useState(false)
-    const { isTyping, editMsg, setEditMsg, inputText, setInputText, setAttachement, attachementPreview, setAttachementPreview } = userChatContext()
+    const { isTyping, editMsg, setEditMsg, inputText, setInputText, setAttachement, attachementPreview, setAttachementPreview, data } = userChatContext()
 
 
     const onEmojiClick = (emojiData) => {
@@ -100,7 +100,7 @@ const ChatFooter = () => {
 
             {isTyping && (<div className='absolute -top-6 left-4 bg-c2 w-full h-6'>
                 <div className='flex gap-2 w-full h-full opacity-50 text-sm text-white'>
-                    {`User is Typing`}
+                    {`${data?.user?.displayName} is Typing`}
                     <img src='./typing.svg' />
                 </div>
             </div>)}

@@ -8,13 +8,34 @@ import { TbSend } from 'react-icons/tb'
 import { v4 as uuid } from 'uuid'
 
 
+
+let typingTimeOut = null
+
 const Composebar = () => {
 
     const { inputText, setInputText, data, attachement, setAttachement, setAttachementPreview, editMsg, setEditMsg } = userChatContext()
     const { currentUser } = useAuth()
 
-    const handleTyping = (e) => {
+    const handleTyping = async (e) => {
         setInputText(e.target.value)
+
+        await updateDoc(doc(db, 'chats', data.chatId), {
+            [`typing.${currentUser.uid}`]: true
+        })
+
+
+        if (typingTimeOut) {
+            clearTimeout(typingTimeOut)
+        }
+
+
+        typingTimeOut = setTimeout(async () => {
+            await updateDoc(doc(db, 'chats', data.chatId), {
+                [`typing.${currentUser.uid}`]: false
+            })
+
+            typingTimeOut = null
+        }, 5000)
     }
 
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { userChatContext } from '@/context/chatContext'
-import { Timestamp, collection, doc, onSnapshot } from 'firebase/firestore'
+import { Timestamp, collection, doc, getDoc, onSnapshot, query, updateDoc, where } from 'firebase/firestore'
 import { db } from '@/firebase/firebase'
 import { RiSearch2Line } from 'react-icons/ri'
 import Avatar from './Avatar'
@@ -10,9 +10,10 @@ import { formatDate } from '@/utils/helpers'
 
 const Chats = () => {
 
-    const { users, setUsers, chats, setChats, selectedChat, setSelectedChat, dispatch } = userChatContext()
+    const { users, setUsers, chats, setChats, selectedChat, setSelectedChat, dispatch, data } = userChatContext()
 
     const [search, setSearch] = useState("")
+    const [unreadMsgs, setUnreadMsgs] = useState({})
     const { currentUser } = useAuth()
 
 
@@ -43,6 +44,49 @@ const Chats = () => {
         )
 
     }, [])
+
+
+
+    useEffect(() => {
+
+        const documentIds = Object.keys(chats)
+
+        if (documentIds.length === 0) {
+            return;
+        }
+
+        const q = query(
+            collection(db, 'chats'),
+            where('__name__', 'in', documentIds)
+        )
+
+
+        const unsub = onSnapshot(q, (snapshot) => {
+            let msgs = {}
+
+            snapshot.forEach((doc) => {
+
+                if (doc.id !== data.chatId) {
+
+                    msgs[doc.id] = doc.data().messages
+                        .filter((m) => m?.read === false && m?.sender !== currentUser.uid)
+                }
+
+                Object.keys(msgs || {})?.map(c => {
+
+                    if (msgs[c]?.length < 1) {
+                        delete msgs[c];
+                    }
+                })
+            })
+
+            setUnreadMsgs(msgs)
+        })
+
+        return () => unsub()
+
+    }, [chats, selectedChat])
+
 
 
 
@@ -92,6 +136,27 @@ const Chats = () => {
 
 
 
+    const readChat = async (chatId) => {
+
+        const chatRef = doc(db, 'chats', chatId)
+        const chatDoc = await getDoc(chatRef)
+
+        let updatedMessages = chatDoc.data().messages.map((m) => {
+
+            if (m?.read === false) {
+                m.read = true
+            }
+
+            return m
+        })
+
+        await updateDoc(chatRef, {
+            messages: updatedMessages
+        })
+    }
+
+
+
     const handleSelect = (user, selectedChatId) => {
 
         setSelectedChat(user)
@@ -100,6 +165,10 @@ const Chats = () => {
             type: 'CHANGE_USER',
             payload: user
         })
+
+        if (unreadMsgs?.[selectedChatId]?.length > 0) {
+            readChat(selectedChatId)
+        }
     }
 
 
@@ -158,7 +227,9 @@ const Chats = () => {
                                     {chat[1]?.lastMessage?.text || (chat[1]?.lastMessage?.img && 'image') || 'Send first message'}
                                 </p>
 
-                                <span className='absolute right-0 top-7 min-w-[20px] h-5 rounded-full bg-red-500 flex justify-center items-center text-sm'>5</span>
+                                {!!unreadMsgs?.[chat[0]]?.length && <span className='absolute right-0 top-7 min-w-[20px] h-5 rounded-full bg-red-500 flex justify-center items-center text-sm'>
+                                    {unreadMsgs?.[chat[0]]?.length}
+                                </span>}
                             </div>
 
                         </li>

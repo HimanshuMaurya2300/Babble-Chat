@@ -10,7 +10,7 @@ const Messages = () => {
 
     const [messages, setMessages] = useState([]);
 
-    const { data } = userChatContext()
+    const { data, setIsTyping } = userChatContext()
     const { currentUser } = useAuth()
 
     const ref = useRef()
@@ -21,6 +21,7 @@ const Messages = () => {
 
             if (doc.exists()) {
                 setMessages(doc.data().messages)
+                setIsTyping(doc.data()?.typing?.[data.user.uid] || false)
             }
 
             setTimeout(() => {
