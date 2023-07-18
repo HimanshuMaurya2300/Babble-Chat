@@ -10,6 +10,15 @@ export const ChatContextProvider = ({ children }) => {
     const [chats, setChats] = useState([])
     const [selectedChat, setSelectedChat] = useState(null)
 
+    const [inputText, setInputText] = useState("")
+    const [attachement, setAttachement] = useState(null)
+    const [attachementPreview, setAttachementPreview] = useState(null)
+    const [editMsg, setEditMsg] = useState(null)
+    const [isTyping, setIsTyping] = useState(null)
+    const [imageViewer, setImageViewer] = useState(null)
+
+
+
     const { currentUser } = useAuth()
 
     const INITIAL_STATE = {
@@ -37,7 +46,19 @@ export const ChatContextProvider = ({ children }) => {
 
 
     return (
-        <chatContext.Provider value={{ users, setUsers, data: state, dispatch, chats, setChats, selectedChat, setSelectedChat }}>
+        <chatContext.Provider value={{
+            users, setUsers,
+            data: state,
+            dispatch,
+            chats, setChats,
+            selectedChat, setSelectedChat,
+            inputText, setInputText,
+            attachement, setAttachement,
+            attachementPreview, setAttachementPreview,
+            editMsg, setEditMsg,
+            isTyping, setIsTyping,
+            imageViewer, setImageViewer
+        }}>
             {children}
         </chatContext.Provider>
     )

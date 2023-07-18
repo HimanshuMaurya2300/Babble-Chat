@@ -25,9 +25,6 @@ const Home = () => {
 
 
   return !currentUser ? <Loader /> : (
-    // <div>
-    //   <button onClick={signOut}>Sign out</button>
-    // </div>\
 
     <div className='bg-c1 flex h-[100vh]'>
       <div className='flex w-full shrink-0'>
