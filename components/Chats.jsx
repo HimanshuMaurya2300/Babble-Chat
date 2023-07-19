@@ -10,7 +10,7 @@ import { formatDate } from '@/utils/helpers'
 
 const Chats = () => {
 
-    const { users, setUsers, chats, setChats, selectedChat, setSelectedChat, dispatch, data } = userChatContext()
+    const { users, setUsers, chats, setChats, selectedChat, setSelectedChat, dispatch, data, resetFooterState } = userChatContext()
 
     const [search, setSearch] = useState("")
     const [unreadMsgs, setUnreadMsgs] = useState({})
@@ -19,6 +19,16 @@ const Chats = () => {
 
     const isBlockExecutedRef = useRef(false)
     const isUsersFetchedRef = useRef(false)
+
+
+
+    useEffect(() => {
+
+        resetFooterState()
+
+    }, [data.chatId])
+
+
 
 
 
@@ -100,12 +110,19 @@ const Chats = () => {
                     setChats(data)
 
                     if (!isBlockExecutedRef.current && isUsersFetchedRef.current && users) {
-                        const firstChat = Object.values(data).sort((a, b) => b.date - a.date)[0]
+
+                        const firstChat = Object.values(data)
+                            .filter(chat => !chat.hasOwnProperty('chatDeleted'))
+                            .sort((a, b) => b.date - a.date)[0]
 
                         if (firstChat) {
                             const user = users[firstChat?.userInfo?.uid]
 
                             handleSelect(user)
+
+                            const chatId = currentUser.uid > user.uid ? currentUser.uid + user.uid : user.uid + currentUser.uid
+
+                            readChat(chatId)
                         }
 
                         isBlockExecutedRef.current = true
@@ -121,6 +138,7 @@ const Chats = () => {
 
 
     const filteredChats = Object.entries(chats || {})
+        .filter(([, chat]) => !chat.hasOwnProperty('chatDeleted'))
         .filter(
             ([, chat]) => chat?.userInfo?.displayName
                 .toLowerCase()

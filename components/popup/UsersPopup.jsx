@@ -3,7 +3,7 @@ import PopupWrapper from './PopupWrapper'
 import { useAuth } from '@/context/authContext'
 import { userChatContext } from '@/context/chatContext'
 import Avatar from '../Avatar'
-import { doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore'
+import { deleteField, doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore'
 import { db } from '@/firebase/firebase'
 import Search from '../Search'
 
@@ -64,6 +64,10 @@ const UsersPopup = (props) => {
 
             }
             else {
+
+                await updateDoc(doc(db, 'userChats', currentUser.uid), {
+                    [combinedId + '.chatDeleted']: deleteField()
+                })
 
             }
 

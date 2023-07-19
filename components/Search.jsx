@@ -104,6 +104,9 @@ const Search = () => {
             }
             else {
 
+                await updateDoc(doc(db, 'userChats', currentUser.uid), {
+                    [combinedId + '.chatDeleted']: deleteField()
+                })
             }
 
 
