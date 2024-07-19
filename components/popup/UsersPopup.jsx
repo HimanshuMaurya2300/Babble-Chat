@@ -97,7 +97,7 @@ const UsersPopup = (props) => {
                 <div className='absolute w-full'>
 
                     {users && Object.values(users).map((user) => (
-                        <div className='flex items-center gap-4 rounded-xl hover:bg-c5 py-2 px-4 cursor-pointer' onClick={() => handleSelect(user)}>
+                        <div className='flex items-center gap-4 rounded-xl hover:bg-c5 py-2 px-4 cursor-pointer' onClick={() => handleSelect(user)} key={''}>
                             <Avatar size='large' user={user} />
 
                             <div className='flex flex-col gap-1 grow'>
